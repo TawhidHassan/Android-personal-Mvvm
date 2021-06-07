@@ -19,6 +19,7 @@ public class ContactViewModel extends AndroidViewModel {
     private ContactRepository repository;
     public LiveData<String> insertResultLiveData;
     public LiveData<List<ContactUser>> getContactLiveData;
+    public LiveData<List<ContactUser>> searchLiveData;
 
     public ContactViewModel(@NonNull Application application) {
         super(application);
@@ -43,5 +44,8 @@ public class ContactViewModel extends AndroidViewModel {
 
     public void updateImage(String id, Uri updateUri) {
         repository.updateImageFirebase(id,updateUri);
+    }
+    public void search(String s){
+        searchLiveData= repository.searchDataFirebase(s);
     }
 }

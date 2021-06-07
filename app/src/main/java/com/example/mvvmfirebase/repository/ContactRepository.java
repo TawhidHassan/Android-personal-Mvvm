@@ -3,6 +3,7 @@ package com.example.mvvmfirebase.repository;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mvvmfirebase.model.ContactUser;
@@ -188,5 +189,38 @@ public class ContactRepository {
 
             }
         });
+    }
+
+    public LiveData<List<ContactUser>> searchDataFirebase(String s) {
+        String currentUser= firebaseAuth.getCurrentUser().getUid();
+
+        final List<ContactUser> searchList= new ArrayList<>();
+        final MutableLiveData<List<ContactUser>> getSearchMutableLiveData= new MutableLiveData<>();
+
+        firebaseFirestore.collection("ContactList").document(currentUser).collection("User").whereEqualTo("contact_Search",s)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                for(DocumentSnapshot documentSnapshot: task.getResult()){
+                    String id= documentSnapshot.getString("contact_Id");
+                    String name= documentSnapshot.getString("contact_Name");
+                    String image= documentSnapshot.getString("contact_Image");
+                    String phone= documentSnapshot.getString("contact_Phone");
+                    String email= documentSnapshot.getString("contact_Email");
+                    ContactUser user= new ContactUser(id,name,image,phone,email);
+                    searchList.add(user);
+                }
+                getSearchMutableLiveData.setValue(searchList);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
+
+
+        return getSearchMutableLiveData;
     }
 }
