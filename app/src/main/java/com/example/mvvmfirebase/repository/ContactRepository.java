@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mvvmfirebase.model.ContactUser;
+import com.example.mvvmfirebase.model.UpdateUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -140,4 +141,52 @@ public class ContactRepository {
 
     }
 
+    public void updateInfoFirebase(UpdateUser user) {
+        final String currentUser= firebaseAuth.getCurrentUser().getUid();
+        firebaseFirestore.collection("ContactList").document(currentUser)
+                .collection("User").document(user.contactId)
+                .update("contact_Name",user.contactName,
+                        "contact_Phone",user.contactPhone,"contact_Email",user.contactEmail).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+    //update Image
+    public void updateImageFirebase(final String id, Uri uri){
+        final String currentUser= firebaseAuth.getCurrentUser().getUid();
+
+        final StorageReference image_path= storageReference.child("profile_image").child(currentUser).child(id+".jpg");
+
+        image_path.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                image_path.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        firebaseFirestore.collection("ContactList").document(currentUser)
+                                .collection("User").document(id).update("contact_Image",uri.toString())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                    }
+                                });
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
 }
