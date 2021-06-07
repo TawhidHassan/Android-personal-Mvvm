@@ -102,7 +102,7 @@ public class ListFragment extends Fragment implements ContactAdapter.ClickInterf
 
                 }
                 if(which==1){
-
+                    contactViewModel.delete(id);
                     Toast.makeText(getActivity(), "Delete", Toast.LENGTH_SHORT).show();
                     userList.remove(position);
                     adapter.notifyItemRemoved(position);

@@ -31,4 +31,8 @@ public class ContactViewModel extends AndroidViewModel {
     public void show(){
         getContactLiveData= repository.getDataFromFireStore();
     }
+
+    public void delete(String id) {
+        repository.deleteDataFirebase(id);
+    }
 }

@@ -120,4 +120,24 @@ public class ContactRepository {
 
     }
 
+    public void deleteDataFirebase(String id) {
+        final String currentUser= firebaseAuth.getCurrentUser().getUid();
+
+        StorageReference deleteImage= storageReference.child("profile_image").child(currentUser).child(id+".jpg");
+
+        deleteImage.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                firebaseFirestore.collection("ContactList").document(currentUser).collection("User")
+                        .document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                });
+            }
+        });
+
+    }
+
 }
