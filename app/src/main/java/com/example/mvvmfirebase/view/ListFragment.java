@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import com.example.mvvmfirebase.R;
 import com.example.mvvmfirebase.adapter.ContactAdapter;
+import com.example.mvvmfirebase.dialogue.DetailsDialogue;
 import com.example.mvvmfirebase.model.ContactUser;
 import com.example.mvvmfirebase.viewmodel.ContactViewModel;
 
@@ -26,7 +27,7 @@ import java.util.List;
 
 import dmax.dialog.SpotsDialog;
 
-public class ListFragment extends Fragment {
+public class ListFragment extends Fragment implements ContactAdapter.ClickInterface {
 
     private SearchView searchView;
     private RecyclerView recyclerView;
@@ -52,7 +53,7 @@ public class ListFragment extends Fragment {
         //find Section...
         searchView= view.findViewById(R.id.searchViewId);
         recyclerView= view.findViewById(R.id.recycleViewId);
-        adapter= new ContactAdapter();
+        adapter= new ContactAdapter(this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
@@ -77,4 +78,21 @@ public class ListFragment extends Fragment {
                 .get(ContactViewModel.class);
     }
 
+    @Override
+    public void onItemClick(int position) {
+//Toast.makeText(getActivity(), ""+position, Toast.LENGTH_SHORT).show();
+        openDetailsDialogue(position);
+    }
+
+
+
+    @Override
+    public void onLongItemClick(int position) {
+
+    }
+
+    private void openDetailsDialogue(int position) {
+        DetailsDialogue dialogue= new DetailsDialogue(userList,position);
+        dialogue.show(getChildFragmentManager(),"Details Dialogue");
+    }
 }

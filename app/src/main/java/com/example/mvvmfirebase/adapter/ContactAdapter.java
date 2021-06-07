@@ -21,6 +21,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
     private List<ContactUser> userList;
 
+    private ClickInterface clickInterface;
+
+    public ContactAdapter(ClickInterface clickInterface) {
+        this.clickInterface= clickInterface;
+    }
 
     public void getContactList(List<ContactUser> userList){
         this.userList= userList;
@@ -49,7 +54,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     }
 
 
-    public class ContactViewHolder extends RecyclerView.ViewHolder{
+    public class ContactViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private CircleImageView circleImageView;
         private TextView contactId;
         private TextView contactName;
@@ -59,6 +64,28 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             circleImageView= itemView.findViewById(R.id.singleImageId);
             contactId= itemView.findViewById(R.id.singleContactId);
             contactName= itemView.findViewById(R.id.singleNameId);
+
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+
+            clickInterface.onItemClick(getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            clickInterface.onLongItemClick(getAdapterPosition());
+            return false;
         }
     }
+
+    public interface ClickInterface {
+        // for on Click....
+        void onItemClick(int position);
+        void onLongItemClick(int position);
+    }
+
 }
