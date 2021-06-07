@@ -1,6 +1,7 @@
 package com.example.mvvmfirebase.view;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.mvvmfirebase.R;
 import com.example.mvvmfirebase.adapter.ContactAdapter;
@@ -88,7 +90,25 @@ public class ListFragment extends Fragment implements ContactAdapter.ClickInterf
 
     @Override
     public void onLongItemClick(int position) {
+        final String id= userList.get(position).contactId;
 
+        AlertDialog.Builder builder= new AlertDialog.Builder(getActivity());
+
+        String[] option= {"Update","Delete"};
+        builder.setItems(option, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(which==0){
+
+                }
+                if(which==1){
+
+                    Toast.makeText(getActivity(), "Delete", Toast.LENGTH_SHORT).show();
+                    userList.remove(position);
+                    adapter.notifyItemRemoved(position);
+                }
+            }
+        }).create().show();
     }
 
     private void openDetailsDialogue(int position) {
