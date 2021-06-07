@@ -1,6 +1,7 @@
 package com.example.mvvmfirebase.view;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,18 +14,27 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.mvvmfirebase.R;
+import com.example.mvvmfirebase.model.ContactUser;
+import com.example.mvvmfirebase.viewmodel.ContactViewModel;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.util.Random;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import dmax.dialog.SpotsDialog;
 
 public class InsertFragment extends Fragment {
 
@@ -36,6 +46,9 @@ public class InsertFragment extends Fragment {
     private Button saveButton;
     private Uri insertImageUri= null;
     private static final int CAPTURE_PICCODE = 989;
+
+    //view Model
+    private ContactViewModel contactViewModel;
 
     public InsertFragment() {
     }
@@ -50,6 +63,9 @@ public class InsertFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        initialViewModel();
+
         //find section...
         insertImageView= view.findViewById(R.id.insertImageId);
         insertNameEditText= view.findViewById(R.id.insertNameId);
@@ -69,9 +85,60 @@ public class InsertFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+                String id= randomDigit();
+                String name= insertNameEditText.getText().toString();
+                String phone= insertPhoneEditText.getText().toString();
+                String email= insertEmailEditText.getText().toString();
+
+                if(!TextUtils.isEmpty(name) && !TextUtils.isEmpty(phone) && !TextUtils.isEmpty(email) && insertImageUri != null){
+                   //show spots dialogue here.....
+                    final AlertDialog dialogue= new SpotsDialog.Builder().setContext(getActivity()).setTheme(R.style.Custom).setCancelable(true).build();
+                    dialogue.show();
+
+                    ContactUser user= new ContactUser(id,name,"image_uri",phone,email);
+                    contactViewModel.insert(user,insertImageUri);
+
+                    contactViewModel.insertResultLiveData.observe(getActivity(), new Observer<String>() {
+                        @Override
+                        public void onChanged(String s) {
+                            dialogue.dismiss();
+                            Toast.makeText(getActivity(), ""+s, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    insertImageView.setImageResource(R.drawable.profile);
+                    insertNameEditText.setText("");
+                    insertPhoneEditText.setText("");
+                    insertEmailEditText.setText("");
+
+
+                }else {
+                    Toast.makeText(getActivity(), "Please Fill up all field", Toast.LENGTH_SHORT).show();
+                }
+
             }
 
         });
+
+    }
+
+    private void initialViewModel() {
+        contactViewModel=new ViewModelProvider(getActivity(),ViewModelProvider.AndroidViewModelFactory.getInstance(getActivity().getApplication()))
+                .get(ContactViewModel.class);
+    }
+
+    //generate a random digit.........
+    private String randomDigit() {
+
+        char[] chars= "1234567890".toCharArray();
+        StringBuilder stringBuilder= new StringBuilder();
+        Random random= new Random();
+        for(int i=0;i<4;i++){
+            char c= chars[random.nextInt(chars.length)];
+            stringBuilder.append(c);
+        }
+        return stringBuilder.toString();
+
 
     }
 
