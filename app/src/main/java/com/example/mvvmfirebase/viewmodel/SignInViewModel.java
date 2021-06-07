@@ -14,6 +14,7 @@ public class SignInViewModel extends AndroidViewModel {
     private SignInRepository repository;
     public LiveData<SignInUser>checkAuthenTicateLiveData;
     public LiveData<String> authenticateUserLiveData;
+    public LiveData<SignInUser> collectUserInfoLiveData;
 
     public SignInViewModel(@NonNull Application application) {
         super(application);
@@ -29,6 +30,10 @@ public class SignInViewModel extends AndroidViewModel {
         authenticateUserLiveData = repository.firebaseSiginWithGoogle(authCredential);
     }
 
+    //collect user info  from authentication..........
+    public void collectUserInfo(){
+        collectUserInfoLiveData=repository.collectUserData();
+    }
 
 
 }
